@@ -6,7 +6,8 @@ const UserSchema = new Schema({
     Username: String,
     Password: String,
     Email: String,
-    Bucket: String
+    Bucket: String,
+    Mail: Array
 });
 
 const BoardSchema = new Schema({

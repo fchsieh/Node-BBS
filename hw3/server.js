@@ -3,6 +3,8 @@ const net = require("net");
 const userfunc = require("./userfunc.js");
 // hw2
 const board = require("./board.js");
+// hw3
+const mail = require("./mail.js");
 
 const server = net.createServer((socket) => {
     socket["Session"] = new Object();
@@ -32,89 +34,89 @@ server.on("connection", (socket) => {
                         socket.write("Usage: register <username> <email> <password>\n% ");
                     } else {
                         userfunc.register(socket, recv);
-                    }
-                    break;
+                    } break;
                 case "login":
                     if (recv.length !== 3) {
                         socket.write("Usage: login <username> <password>\n% ");
                     } else {
                         socket["Session"] = userfunc.login(socket, recv);
-                    }
-                    break;
+                    } break;
                 case "logout":
                     if (recv.length !== 1) {
                         socket.write("Usage: logout\n% ");
                     } else {
                         userfunc.logout(socket);
-                    }
-                    break;
+                    } break;
                 case "whoami":
                     if (recv.length !== 1) {
                         socket.write("Usage: whoami\n% ");
                     } else {
                         userfunc.whoami(socket);
-                    }
-                    break;
+                    } break;
                 // === hw 2 ===
                 case "create-board":
                     if (recv.length !== 2) {
                         socket.write("Usage: create-board <name>\n% ");
                     } else {
                         board.create_board(socket, recv);
-                    }
-                    break;
+                    } break;
                 case "list-board":
                     if (recv.length > 2) {
                         socket.write("Usage: list-board ##<key>\n% ");
                     } else {
                         board.list_board(socket, recv);
-                    }
-                    break;
+                    } break;
                 case "create-post":
                     if (recv.length < 6) {
                         socket.write("Usage: create-post <board-name> --title <title> --content <content>\n% ");
                     } else {
                         board.create_post(socket, recv, data);
-                    }
-                    break;
+                    } break;
                 case "list-post":
                     if (recv.length < 2 || recv.length > 3) {
                         socket.write("Usage: list-post <board-name> ##<key>\n% ");
                     } else {
                         board.list_post(socket, recv);
-                    }
-                    break;
+                    } break;
                 case "read":
                     if (recv.length !== 2) {
                         socket.write("Usage: read <post-id>\n% ");
                     } else {
                         board.read(socket, recv);
-                    }
-                    break;
+                    } break;
                 case "comment":
                     if (recv.length < 3) {
                         socket.write("Usage: comment <post-id> <comment>\n% ");
                     } else {
                         board.comment(socket, recv, data);
-                    }
-                    break;
+                    } break;
                 case "delete-post":
                     if (recv.length !== 2) {
                         socket.write("Usage: delete-post <post-id>\n% ");
                     } else {
                         board.delete_post(socket, recv);
-                    }
-                    break;
+                    } break;
                 case "update-post":
                     if (recv.length < 4) {
                         socket.write("Usage: update-post <post-id> --title/content <new>\n% ");
                     } else {
                         board.update_post(socket, recv, data);
-                    }
-                    break;
+                    } break;
+                // === hw3 ===
+                case "mail-to":
+                    if (recv.length < 6) {
+                        socket.write("Usage: mail-to <username> --subject <subject> --content <content>\n% ");
+                    } else {
+                        mail.mail_to(socket, recv, data);
+                    } break;
+                case "list-mail":
+                    if (recv.length !== 1) {
+                        socket.write("Usage: list-mail\n% ");
+                    } else {
+                        mail.list_mail(socket);
+                    } break;
                 default:
-                    socket.write("% ");
-                    break
+                    socket.write("% "); break;
             }
         } else {
             // empty input

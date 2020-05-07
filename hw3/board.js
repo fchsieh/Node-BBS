@@ -109,13 +109,13 @@ module.exports = {
             return;
         } else {
             let usage = "Usage: create-post <board-name> --title <title> --content <content>\n% ";
-            let parsedCmd = argumentParser(socket, recv[0], data, ["--title", "--content"], usage);
-            if (parsedCmd == null) return;
+            let parsedInput = argumentParser(socket, recv[0], data, ["--title", "--content"], usage);
+            if (parsedInput == null) return;
 
             let author = socket.Session.name;
-            let board = parsedCmd[0];
-            let title = parsedCmd[1];
-            let content = parsedCmd[2];
+            let board = parsedInput[0];
+            let title = parsedInput[1];
+            let content = parsedInput[2];
             // create post key for s3
             let key = (title.replace(/\s+/g, "-") + "-" + Date.now());
             Board.countDocuments({ BoardName: board }, (err, count) => {
@@ -124,13 +124,6 @@ module.exports = {
                     // to save content to s3, needs to pass content to the client
                     User.findOne({ Username: author }, (err, user) => {
                         if (err) throw err;
-                        let s3settings = {
-                            Type: "create-post",
-                            Bucket: user.Bucket,
-                            Key: key,
-                            Content: content
-                        };
-                        socket.write(JSON.stringify(s3settings));
                         // save metadata to db
                         new Post({
                             Board: board,
@@ -144,7 +137,14 @@ module.exports = {
                                 console.error("Create post failed. Check mongoDB:");
                                 return;
                             } else {
-                                socket.write("Create post successfully.\n% ");
+                                // save metadata succeed, ask client to upload post to s3
+                                let s3settings = {
+                                    Type: "create-post",
+                                    Bucket: user.Bucket,
+                                    Key: key,
+                                    Content: content
+                                };
+                                socket.write(JSON.stringify(s3settings));
                                 return;
                             }
                         });
@@ -350,14 +350,14 @@ module.exports = {
                 socket.write(usage);
                 return;
             } else if (recv.includes("--title") && !recv.includes("--content")) {
-                let parsedCmd = argumentParser(socket, recv[0], data, ["--title"], usage);
-                if (parsedCmd == null) return;
-                newInput = parsedCmd[1];
+                let parsedInput = argumentParser(socket, recv[0], data, ["--title"], usage);
+                if (parsedInput == null) return;
+                newInput = parsedInput[1];
                 typeOfUpdate = "Title";
             } else if (recv.includes("--content") && !recv.includes("--title")) {
-                let parsedCmd = argumentParser(socket, recv[0], data, ["--content"], usage)
-                if (parsedCmd == null) return;
-                newInput = parsedCmd[1];
+                let parsedInput = argumentParser(socket, recv[0], data, ["--content"], usage)
+                if (parsedInput == null) return;
+                newInput = parsedInput[1];
                 typeOfUpdate = "Content";
             } else {
                 socket.write(usage);

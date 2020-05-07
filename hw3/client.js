@@ -37,6 +37,7 @@ client.on("data", (data) => {
                 let param = { Bucket: bucket, Key: key, Body: JSON.stringify(bucketContent) };
                 s3.upload(param, (err, result) => {
                     if (err) throw err;
+                    else process.stdout.write("Create post successfully.\n% ");
                 });
             }
                 break;
@@ -76,9 +77,11 @@ client.on("data", (data) => {
                     let recvContent = JSON.parse(data.Body.toString());
                     recvContent["Comment"].push(newComment);
                     // save updates to s3
-                    s3.upload({ Bucket: bucket, Key: key, Body: JSON.stringify(recvContent) }, (err, result) => { if (err) throw err; });
+                    s3.upload({ Bucket: bucket, Key: key, Body: JSON.stringify(recvContent) }, (err, result) => {
+                        if (err) throw err;
+                        else process.stdout.write("Comment successfully.\n% ");
+                    });
                 });
-                process.stdout.write("Comment successfully.\n% ");
             }
                 break;
             case "delete-post": {
@@ -86,8 +89,8 @@ client.on("data", (data) => {
                 let key = recv["Key"];
                 s3.deleteObject({ Bucket: bucket, Key: key }, (err, result) => {
                     if (err) throw err;
-                })
-                process.stdout.write("Delete successfully.\n% ")
+                    else process.stdout.write("Delete successfully.\n% ");
+                });
             }
                 break;
             case "update-post": {
@@ -98,9 +101,21 @@ client.on("data", (data) => {
                     if (err) throw err;
                     let recvContent = JSON.parse(data.Body.toString());
                     recvContent["Content"] = content;
-                    s3.upload({ Bucket: bucket, Key: key, Body: JSON.stringify(recvContent) }, (err, result) => { if (err) throw err; });
+                    s3.upload({ Bucket: bucket, Key: key, Body: JSON.stringify(recvContent) }, (err, result) => {
+                        if (err) throw err;
+                        else process.stdout.write("Update successfully.\n% ");
+                    });
                 });
-                process.stdout.write("Update successfully.\n% ");
+            }
+                break;
+            case "mail-to": {
+                let bucket = recv["Bucket"];
+                let key = recv["Key"];
+                let content = recv["Content"];
+                s3.upload({ Bucket: bucket, Key: key, Body: content }, (err, result) => {
+                    if (err) throw err;
+                    else process.stdout.write("Sent successfully.\n% ");
+                });
             }
                 break;
             default:

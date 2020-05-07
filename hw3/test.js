@@ -1,3 +1,3 @@
-test = "1234567890\t123123\t123123\n123123\t123123\t123123"
+test = [1, 2, 3]
 
-console.log(test)
+console.log(test.slice(1))
