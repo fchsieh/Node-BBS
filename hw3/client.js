@@ -49,6 +49,7 @@ client.on("data", (data) => {
                 let date = recv["Date"];
                 let postMetadata = "Author\t:" + author + "\nTitle\t:" + title + "\nDate\t:" + date + "\n--";
                 s3.getObject({ Bucket: bucket, Key: contentKey }, (err, data) => {
+                    if (err) throw err;
                     console.log(postMetadata);
                     // parse bucket content
                     let recvContent = JSON.parse(data.Body.toString());
@@ -115,6 +116,31 @@ client.on("data", (data) => {
                 s3.upload({ Bucket: bucket, Key: key, Body: content }, (err, result) => {
                     if (err) throw err;
                     else process.stdout.write("Sent successfully.\n% ");
+                });
+            }
+                break;
+            case "retr-mail": {
+                let bucket = recv["Bucket"];
+                let key = recv["Key"];
+                let subject = recv["Subject"];
+                let from = recv["From"];
+                let date = recv["Date"];
+                s3.getObject({ Bucket: bucket, Key: key }, (err, data) => {
+                    if (err) throw err;
+                    let mailContent = data.Body.toString();
+                    let metadata = "Subject\t:" + subject + "\nFrom\t:" + from + "\nDate\t:" + date + "\n--";
+                    console.log(metadata);
+                    console.log(mailContent);
+                    process.stdout.write("% ");
+                });
+            }
+                break;
+            case "delete-mail": {
+                let bucket = recv["Bucket"];
+                let key = recv["Key"];
+                s3.deleteObject({ Bucket: bucket, Key: key }, (err, result) => {
+                    if (err) throw err;
+                    else process.stdout.write("Mail deleted.\n% ");
                 });
             }
                 break;

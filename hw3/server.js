@@ -115,6 +115,18 @@ server.on("connection", (socket) => {
                     } else {
                         mail.list_mail(socket);
                     } break;
+                case "retr-mail":
+                    if (recv.length !== 2) {
+                        socket.write("Usage: retr-mail <mail#>\n% ");
+                    } else {
+                        mail.retr_mail(socket, recv);
+                    } break;
+                case "delete-mail":
+                    if (recv.length !== 2) {
+                        socket.write("Usage: delete-mail <mail#>\n% ");
+                    } else {
+                        mail.delete_mail(socket, recv);
+                    } break;
                 default:
                     socket.write("% "); break;
             }
