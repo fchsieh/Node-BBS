@@ -2,7 +2,17 @@ const net = require("net");
 const AWS = require("aws-sdk");
 const s3 = new AWS.S3();
 
-const client = net.createConnection({ port: 9999, host: "127.0.0.1" });
+let connectHost = undefined;
+let listenPort = undefined;
+if (process.argv.length !== 4) {
+    connectHost = "127.0.0.1";
+    listenPort = 9999;
+} else {
+    connectHost = process.argv[2];
+    listenPort = process.argv[3];
+}
+
+const client = net.createConnection({ port: listenPort, host: connectHost });
 let stdin = process.openStdin();
 
 function isJSON(str) {
