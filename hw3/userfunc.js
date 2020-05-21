@@ -14,7 +14,7 @@ module.exports = {
                 socket.write("Username is already used.\n% ");
                 return;
             } else {
-                // Create bucket: send generated bucket name to client
+                // Create bucket: send the generated bucket name to the client
                 let bucket = "0513328-" + name.toLowerCase() + "-" + Date.now();
                 let s3settings = {
                     Type: "bucket-name",

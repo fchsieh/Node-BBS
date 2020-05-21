@@ -81,7 +81,7 @@ module.exports = {
             let key = ("mail-" + subject.replace(/\s+/g, "-")) + "-" + Date.now();
             let content = parsedInput[2];
 
-            // find recipient and save metadat to the user
+            // find recipient and save metadata to the user
             User.findOne({ Username: recipient }, (err, user) => {
                 if (err) throw err;
                 if (user == null) {
@@ -94,10 +94,11 @@ module.exports = {
                         "Date": new Date(),
                         "Key": key,
                     };
+                    // push to user's mail array
                     User.updateOne({ Username: recipient }, { "$push": { "Mail": newMail } }, (err, success) => {
                         if (err) throw err;
                         if (success) {
-                            // let client upload content to recipient's bucket
+                            // let client upload content to the recipient's bucket
                             let s3settings = {
                                 Type: "mail-to",
                                 Bucket: user["Bucket"],
@@ -198,7 +199,9 @@ module.exports = {
                     Key: user["Mail"][delIdx]["Key"]
                 };
                 socket.write(JSON.stringify(s3settings));
+                // remove item from mail array
                 user["Mail"].splice(delIdx, 1);
+                // update new mail array for user
                 User.updateOne({ Username: username }, { "$set": { "Mail": user["Mail"] } }, (err, success) => {
                     if (err) throw err;
                 });

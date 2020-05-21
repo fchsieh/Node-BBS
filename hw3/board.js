@@ -121,7 +121,7 @@ module.exports = {
             Board.countDocuments({ BoardName: board }, (err, count) => {
                 if (err) throw err;
                 if (count > 0) {
-                    // to save content to s3, needs to pass content to the client
+                    // to save content to s3, need to pass post content to the client
                     User.findOne({ Username: author }, (err, user) => {
                         if (err) throw err;
                         // save metadata to db
@@ -266,6 +266,7 @@ module.exports = {
             socket.write("Post does not exist.\n% ");
             return;
         }
+        // find post's metadata in local db
         Post.findOne({ PostIndex: postid }, (err, post) => {
             if (err) throw err;
             if (post == null) {
@@ -316,6 +317,7 @@ module.exports = {
                     socket.write("Not the post owner.\n% ");
                     return;
                 } else {
+                    // post found, delete it from the local db
                     let key = post["ContentKey"];
                     let bucket = post["Bucket"];
                     Post.findOneAndDelete({ PostIndex: postid }, (err) => {
@@ -350,11 +352,13 @@ module.exports = {
                 socket.write(usage);
                 return;
             } else if (recv.includes("--title") && !recv.includes("--content")) {
+                // update title
                 let parsedInput = argumentParser(socket, recv[0], data, ["--title"], usage);
                 if (parsedInput == null) return;
                 newInput = parsedInput[1];
                 typeOfUpdate = "Title";
             } else if (recv.includes("--content") && !recv.includes("--title")) {
+                // update content
                 let parsedInput = argumentParser(socket, recv[0], data, ["--content"], usage)
                 if (parsedInput == null) return;
                 newInput = parsedInput[1];

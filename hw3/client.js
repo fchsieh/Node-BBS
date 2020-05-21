@@ -98,9 +98,11 @@ client.on("data", (data) => {
                 let bucket = recv["Bucket"];
                 let key = recv["Key"];
                 let content = recv["Content"];
+                // content object in s3 includes comments, need to pull and push
                 s3.getObject({ Bucket: bucket, Key: key }, (err, data) => {
                     if (err) throw err;
                     let recvContent = JSON.parse(data.Body.toString());
+                    // update post content
                     recvContent["Content"] = content;
                     s3.upload({ Bucket: bucket, Key: key, Body: JSON.stringify(recvContent) }, (err, result) => {
                         if (err) throw err;
