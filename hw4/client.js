@@ -41,7 +41,7 @@ stdin.addListener("data", (input) => {
                     // check if keyword had subscribed already
                     for (let sub of subscription[topic]) {
                         if (sub["Keyword"] === keyword) {
-                            process.stdout.write("Already subscribed.\n% ");
+                            process.stdout.write("Already subscribed\n% ");
                             return;
                         }
                     }
@@ -51,32 +51,32 @@ stdin.addListener("data", (input) => {
                         Timestamp: Date.now()
                     });
                 }
-                process.stdout.write("Subscribe successfully.\n% ");
+                process.stdout.write("Subscribe successfully\n% ");
             }
         } else {
-            process.stdout.write("Please login first.\n% ");
+            process.stdout.write("Please login first\n% ");
         }
     } else if (send[0] === "unsubscribe") {
         let usageArr = ["--board", "--author"];
         if (send.length !== 3 || !(usageArr.indexOf(send[1]) > -1)) {
-            process.stdout.write("Usage: unsubscribe --board/--author <board-name>/<author-name>");
+            process.stdout.write("Usage: unsubscribe --board/--author <board-name>/<author-name>\n% ");
         } else {
             let unsubTopic = send[2];
             if (loggedin) {
                 if (subscription[unsubTopic] == null) {
-                    process.stdout.write("You haven't subscribed " + unsubTopic + ".\n% ");
+                    process.stdout.write("You haven't subscribed " + unsubTopic + "\n% ");
                 } else {
                     consumer.removeTopics([unsubTopic], (err, rmv) => { if (err) throw err; });
                     subscription["SubbedTopics"].splice(subscription["SubbedTopics"].indexOf(unsubTopic), 1);
                     delete subscription[unsubTopic];
-                    process.stdout.write("Unsubscribe successfully.\n% ");
+                    process.stdout.write("Unsubscribe successfully\n% ");
                 }
             } else {
-                process.stdout.write("Please login first.\n% ");
+                process.stdout.write("Please login first\n% ");
             }
         }
     } else if (send[0] === "list-sub") {
-        if (loggedin) {
+        if (loggedin && send.length === 1) {
             let authors = { SubTopics: [] };
             let boards = { SubTopics: [] };
             for (let sub of subscription["SubbedTopics"]) {
@@ -128,8 +128,10 @@ stdin.addListener("data", (input) => {
             } else {
                 process.stdout.write("% ");
             }
+        } else if (send.length !== 1) {
+            process.stdout.write("Usage: list-sub.\n% ");
         } else {
-            process.stdout.write("Please login first.\n% ");
+            process.stdout.write("Please login first\n% ");
         }
     } else {
         client.write(input.toString());
