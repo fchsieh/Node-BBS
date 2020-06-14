@@ -129,7 +129,7 @@ stdin.addListener("data", (input) => {
                 process.stdout.write("% ");
             }
         } else if (send.length !== 1) {
-            process.stdout.write("Usage: list-sub.\n% ");
+            process.stdout.write("Usage: list-sub\n% ");
         } else {
             process.stdout.write("Please login first\n% ");
         }
